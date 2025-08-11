@@ -75,23 +75,37 @@ function saveSpinToday() {
     localStorage.setItem(getTodayKey(), "true");
 }
 
-function getTasksKey() {
+// 🎯 Обработка ЗАДАНИЙ по отдельности
+function getTaskKey(task) {
     const userId = tg.initDataUnsafe?.user?.id || "guest";
     const today = new Date().toISOString().split('T')[0];
-    return `tasks_completed_${userId}_${today}`;
+    return `task_${task}_${userId}_${today}`;
 }
 
-function hasCompletedTasks() {
-    return localStorage.getItem(getTasksKey()) === "true";
+function completeTask(task) {
+    localStorage.setItem(getTaskKey(task), "true");
 }
 
-function saveTasksCompleted() {
-    localStorage.setItem(getTasksKey(), "true");
+function hasCompletedAllTasks() {
+    return (
+        localStorage.getItem(getTaskKey("story")) === "true" &&
+        localStorage.getItem(getTaskKey("subscribe")) === "true" &&
+        localStorage.getItem(getTaskKey("invite")) === "true"
+    );
+}
+
+function checkTasksProgress() {
+    const resultText = document.getElementById("result");
+    if (hasCompletedAllTasks()) {
+        resultText.innerText = "✅ Все задания выполнены — теперь вы можете крутить рулетку повторно!";
+    } else {
+        resultText.innerText = "📌 Выполняйте все задания, чтобы получить вторую попытку!";
+    }
 }
 
 // Проверка можно ли крутить
 function canSpin() {
-    return !hasSpunToday() || hasCompletedTasks();
+    return !hasSpunToday() || hasCompletedAllTasks();
 }
 
 // 🔄 Анимация кручения рулетки
@@ -100,7 +114,7 @@ function spinRoulette() {
     if (spinning) return;
 
     if (!canSpin()) {
-        resultText.innerText = "❌ Чтобы крутить рулетку повторно, выполните одно из заданий ниже!";
+        resultText.innerText = "❌ Чтобы крутить рулетку повторно, выполните все задания ниже!";
         return;
     }
 
@@ -130,10 +144,14 @@ function spinRoulette() {
                 saveSpinToday();
             }
 
-            // Если спин по заданию — сброс на завтра
-            if (hasCompletedTasks()) {
-                localStorage.removeItem(getTasksKey());
+            // Если это была вторая попытка — сбрасываем задания до завтра
+            if (hasCompletedAllTasks()) {
+                localStorage.removeItem(getTaskKey("story"));
+                localStorage.removeItem(getTaskKey("subscribe"));
+                localStorage.removeItem(getTaskKey("invite"));
             }
+
+            // 🔔 [НА СЛЕДУЮЩЕМ ШАГЕ]: отправим приз в Telegram
         }
     }
 
@@ -143,21 +161,21 @@ function spinRoulette() {
 // 🎯 Обработчики заданий
 document.getElementById("story-btn").addEventListener("click", () => {
     tg.openLink("https://t.me/YourBotUsername?start=story");
-    saveTasksCompleted();
-    document.getElementById("result").innerText = "✅ Задание выполнено — теперь вы можете крутить рулетку повторно!";
+    completeTask("story");
+    checkTasksProgress();
 });
 
 document.getElementById("subscribe-btn").addEventListener("click", () => {
     tg.openLink("https://t.me/YourChannelName");
-    saveTasksCompleted();
-    document.getElementById("result").innerText = "✅ Задание выполнено — теперь вы можете крутить рулетку повторно!";
+    completeTask("subscribe");
+    checkTasksProgress();
 });
 
 document.getElementById("invite-btn").addEventListener("click", () => {
     navigator.clipboard.writeText("https://t.me/YourBotUsername?start=referral");
-    alert("Ссылка для приглашения скопирована! Пригласите 3 друзей и нажмите кнопку снова.");
-    saveTasksCompleted();
-    document.getElementById("result").innerText = "✅ Задание выполнено — теперь вы можете крутить рулетку повторно!";
+    alert("Ссылка скопирована! Пригласите 3 друзей и нажмите кнопку снова.");
+    completeTask("invite");
+    checkTasksProgress();
 });
 
 // 🟢 Кнопка запуска рулетки
