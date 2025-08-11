@@ -19,12 +19,25 @@
       border: none;
       border-radius: 10px;
       font-size: 18px;
+      cursor: pointer;
+    }
+    #result {
+      margin-top: 20px;
+      font-size: 20px;
     }
   </style>
 </head>
 <body>
   <h1>🚢 The Flying Dutchman</h1>
   <p>Добро пожаловать, капитан!</p>
-  <button onclick="alert('Здесь будет рулетка')">Крутить рулетку 🎰</button>
+  
+  <!-- Кнопка рулетки -->
+  <button id="spin-btn">Крутить рулетку 🎰</button>
+
+  <!-- Показываем результат -->
+  <p id="result"></p>
+
+  <!-- Подключаем наш JS -->
+  <script src="script.js"></script>
 </body>
 </html>
