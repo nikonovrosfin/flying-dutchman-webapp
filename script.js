@@ -9,11 +9,11 @@ const centerY = canvas.height / 2;
 const radius = 140;
 
 const prizes = [
-    "🌟 NFT-звезда",
-    "📦 Стикерпак",
-    "🎨 Тема Telegram",
+    "🌟 Звезда",
+    "🌟 Звезда",
+    "🎨 NFT",
     "😢 Пусто",
-    "🔁 Повторная попытка"
+    "🔁 Повтор"
 ];
 
 const colors = ["#00ffe0", "#00ccaa", "#009977", "#006644", "#003322"];
